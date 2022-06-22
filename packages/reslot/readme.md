@@ -5,6 +5,7 @@
     - [Synchronous Slot](#synchronous-slot)
     - [Asynchronous Slot](#asynchronous-slot)
     - [Infinite loading](#infinite-loading)
+    - [Using slot globally](#using-slot-globally)
 
 # `RESLOT`
 
@@ -110,4 +111,47 @@ const App = () => {
     </>
   );
 };
+```
+
+### Using slot globally
+
+```js
+// create a global slot for storing current theme
+const [theme, updateTheme] = createSlot("light");
+
+const getThemedStyle = (type) =>
+  type === "dark"
+    ? { color: "white", backgroundColor: "black" }
+    : { color: "black", backgroundColor: "white" };
+
+const ThemeSwitcher = () =>
+  theme((value) => (
+    <button onClick={() => updateTheme(value === "dark" ? "light" : "dark")}>
+      {value}
+    </button>
+  ));
+
+const ThemedBox = () =>
+  theme((value) => {
+    const style = getThemedStyle(value);
+    return (
+      <div
+        style={{
+          ...style,
+          width: 200,
+          padding: 20,
+          border: "5px solid silver",
+        }}
+      >
+        Hello World
+      </div>
+    );
+  });
+
+const App = () => (
+  <>
+    <ThemeSwitcher />
+    <ThemedBox />
+  </>
+);
 ```
