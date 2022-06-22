@@ -55,6 +55,42 @@ const App = () => {
 };
 ```
 
+Compare to using normal way
+
+```js
+// create Redux store here
+const store = createStore();
+// create reducer code here
+
+const CounterSlot = memo(() => {
+  return useSelector((state) => state.count);
+});
+
+const DoubleCounterSlot = memo(() => {
+  return useSelector((state) => state.count * 2);
+});
+
+const App = () => {
+  const dispatch = useDispatch();
+  const handleIncrement = () => dispatch({ type: "Increment" });
+
+  return (
+    <>
+      <BigDataTable />
+      <h1>
+        Counter: <CounterSlot />
+      </h1>
+      <h1>
+        Double Counter: <DoubleCounter />
+      </h1>
+      <button onClick={handleIncrement}>Increment</button>
+    </>
+  );
+};
+```
+
+With the way above you can do a similar thing to what Reslot does, but you must write much code and bring local logic to the global store
+
 ### Asynchronous Slot
 
 ```jsx
@@ -63,15 +99,29 @@ import { useSlot } from "reslot";
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const App = () => {
+  // Assuming that we want to render a counter whose initial value is 0. In reslot, it means
+  // we need to define a counter slot for it.
+
+  // Step 1: Register a rendering slot with the initial value of 0 by calling useSlot(0). It will
+  // return a tuple of utility functions:
+  // + counterSlot(): use it to mark a slot in this parent component.
+  // + updateCounterSlot(): use it to trigger a re-rendering of all marked slots within this parent component.
   const [counterSlot, updateCounterSlot] = useSlot(0);
-  // update slot function can retrieve async value or async function as an argument
+
+  // Step 2: Define when a slot re-rendering will be triggered. For example, in our case slots will be re-rendered
+  // when the Increment button is clicked.
   const handleIncrement = () =>
+    // update slot function can retrieve async value or async function as an argument
     updateCounterSlot((prev) => delay(2000).then(() => prev + 1));
 
   return (
     <>
       <BigDataTable />
-      {/* show loading indicator when slot is updating, you can use an overload slot(render, fallback) to customize rendering */}
+      {
+        // Step 3: Mark slots. For example, in our case, the counter slot is only the changing counter value.
+        // Also note that it is possible to customize rendering using this overload counterSlot(render, fallback),
+        // such as showing a loading indicator when the slot is being updated in our example.
+      }
       <h1>Counter: {counterSlot(<div>Loading...</div>)}</h1>
       <button onClick={handleIncrement}>Increment</button>
     </>
