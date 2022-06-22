@@ -116,6 +116,10 @@ const App = () => {
 
   return (
     <>
+      {
+        // a component that contains complex logic, we can use memo() to wrap this component,
+        // but it's hard to deal with the component has function type prop values
+      }
       <BigDataTable />
       {
         // Step 3: Mark slots. For example, in our case, the counter slot is only the changing counter value.
